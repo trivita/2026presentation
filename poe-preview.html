@@ -1,0 +1,1176 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta name="x-poe-datastore-behavior" content="local_only"><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 转型演示文稿</title>
+  <style>
+    :root {
+      --bg-1: #09111f;
+      --bg-2: #0d1728;
+      --bg-3: #0a1020;
+      --panel: rgba(255,255,255,0.05);
+      --panel-strong: rgba(255,255,255,0.08);
+      --border: rgba(126,203,255,0.18);
+      --text: #eaf1fb;
+      --muted: #b8c5d8;
+      --blue: #7ecbff;
+      --cyan: #79f0d1;
+      --orange: #ffb86c;
+      --strong: #ffffff;
+      --shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      background: #07101c;
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(55,130,255,0.14), transparent 24%),
+        radial-gradient(circle at bottom left, rgba(0,214,201,0.08), transparent 28%),
+        linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 48%, var(--bg-3) 100%);
+      overflow: hidden;
+    }
+
+    .deck {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 4.8vh 5.5vw 8.5vh;
+      display: none;
+      flex-direction: column;
+      justify-content: flex-start;
+      gap: 1.8vh;
+      animation: fadeIn 260ms ease;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .eyebrow {
+      color: var(--blue);
+      font-size: clamp(14px, 1.2vw, 22px);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--strong);
+      font-size: clamp(30px, 3.1vw, 60px);
+      line-height: 1.12;
+      font-weight: 800;
+      max-width: 88%;
+    }
+
+    .subtitle {
+      font-size: clamp(18px, 1.55vw, 30px);
+      line-height: 1.5;
+      color: var(--muted);
+      max-width: 84%;
+    }
+
+    .accent-blue { color: var(--blue); }
+    .accent-cyan { color: var(--cyan); }
+    .accent-orange { color: var(--orange); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1.15fr 0.95fr;
+      gap: 1.4vw;
+      margin-top: 0.8vh;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-2-even {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.4vw;
+      margin-top: 0.8vh;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1vw;
+      margin-top: 0.8vh;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1vw;
+      margin-top: 0.8vh;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.9vw;
+      margin-top: 0.8vh;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 1.4vw;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(6px);
+      min-height: 0;
+    }
+
+    .panel-title {
+      font-size: clamp(16px, 1.25vw, 24px);
+      color: var(--blue);
+      margin-bottom: 1vh;
+      font-weight: 700;
+    }
+
+    .panel-title.cyan { color: var(--cyan); }
+    .panel-title.orange { color: var(--orange); }
+
+    .big-kpi {
+      font-size: clamp(26px, 2.1vw, 42px);
+      font-weight: 800;
+      color: var(--strong);
+      line-height: 1.2;
+      margin-bottom: 0.6vh;
+    }
+
+    .body-text, .panel p, .panel li {
+      font-size: clamp(16px, 1.22vw, 24px);
+      line-height: 1.52;
+      color: var(--text);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .list {
+      display: grid;
+      gap: 0.8vh;
+    }
+
+    .list-item {
+      display: flex;
+      gap: 0.75vw;
+      align-items: flex-start;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-top: 0.7em;
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, #58c4ff, #2ef2c2);
+    }
+
+    .step-card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 1.25vw;
+      min-height: 0;
+      box-shadow: var(--shadow);
+    }
+
+    .step-no {
+      color: var(--blue);
+      font-size: clamp(12px, 1vw, 18px);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.8vh;
+      font-weight: 700;
+    }
+
+    .step-card h3 {
+      margin: 0 0 0.7vh 0;
+      font-size: clamp(20px, 1.7vw, 32px);
+      color: var(--strong);
+    }
+
+    .tag {
+      display: inline-block;
+      margin-top: 1vh;
+      padding: 0.35em 0.8em;
+      border-radius: 999px;
+      background: rgba(87,215,255,0.12);
+      border: 1px solid rgba(87,215,255,0.18);
+      color: #8ddfff;
+      font-size: clamp(12px, 0.92vw, 16px);
+    }
+
+    .punchline {
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 1.2vh;
+      font-size: clamp(18px, 1.45vw, 30px);
+      line-height: 1.5;
+      color: var(--strong);
+      font-weight: 800;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1vw;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1vw;
+      margin-top: 0.8vh;
+    }
+
+    .metric {
+      background: var(--panel);
+      border: 1px solid rgba(126,203,255,0.14);
+      border-radius: 18px;
+      padding: 1.1vw;
+      box-shadow: var(--shadow);
+    }
+
+    .metric h3 {
+      margin: 0 0 0.6vh 0;
+      font-size: clamp(16px, 1.25vw, 24px);
+      color: var(--blue);
+    }
+
+    .metric p {
+      margin: 0;
+      font-size: clamp(15px, 1.12vw, 22px);
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .cover {
+      justify-content: center;
+    }
+
+    .cover .hero {
+      max-width: 72%;
+      display: grid;
+      gap: 2vh;
+    }
+
+    .cover h1 {
+      font-size: clamp(38px, 4vw, 78px);
+      max-width: 100%;
+    }
+
+    .cover .subtitle {
+      max-width: 100%;
+      font-size: clamp(20px, 1.7vw, 32px);
+    }
+
+    .hero-badges {
+      display: flex;
+      gap: 0.9vw;
+      flex-wrap: wrap;
+      margin-top: 1vh;
+    }
+
+    .badge {
+      padding: 0.55em 0.95em;
+      border-radius: 999px;
+      border: 1px solid rgba(126,203,255,0.24);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      font-size: clamp(13px, 0.95vw, 18px);
+    }
+
+    .chapter-nav {
+      position: absolute;
+      top: 2vh;
+      right: 2vw;
+      display: flex;
+      gap: 0.5vw;
+      flex-wrap: wrap;
+      max-width: 32vw;
+      justify-content: flex-end;
+      z-index: 20;
+    }
+
+    .chapter-chip {
+      border: 1px solid rgba(126,203,255,0.18);
+      background: rgba(255,255,255,0.04);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 0.42em 0.82em;
+      font-size: clamp(11px, 0.85vw, 15px);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .chapter-chip:hover {
+      color: var(--strong);
+      border-color: rgba(126,203,255,0.35);
+    }
+
+    .chapter-chip.active {
+      color: var(--strong);
+      background: rgba(87,215,255,0.12);
+      border-color: rgba(87,215,255,0.32);
+    }
+
+    .footer-ui {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 30;
+      padding: 1.2vh 1.8vw 1.5vh;
+      background: linear-gradient(to top, rgba(7,12,20,0.88), rgba(7,12,20,0.0));
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin-bottom: 0.9vh;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #58c4ff, #2ef2c2);
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .footer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1vw;
+      color: var(--muted);
+      font-size: clamp(12px, 0.95vw, 16px);
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.6vw;
+      align-items: center;
+    }
+
+    .btn {
+      border: 1px solid rgba(126,203,255,0.18);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 0.55em 0.9em;
+      font-size: clamp(12px, 0.9vw, 16px);
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .table-like {
+      display: grid;
+      gap: 0.75vh;
+    }
+
+    .row-card {
+      display: grid;
+      grid-template-columns: 0.9fr 1.5fr 1.1fr;
+      gap: 1vw;
+      padding: 0.95vw 1vw;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .row-card.header {
+      background: rgba(126,203,255,0.08);
+      border-color: rgba(126,203,255,0.16);
+      color: var(--strong);
+      font-weight: 700;
+    }
+
+    .center-stack {
+      display: grid;
+      gap: 1vw;
+    }
+
+    .two-col-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8vw 1.2vw;
+    }
+
+    .small {
+      font-size: clamp(12px, 0.88vw, 15px);
+      color: var(--muted);
+    }
+
+    .quote-box {
+      background: rgba(255,255,255,0.04);
+      border-left: 4px solid var(--orange);
+      border-radius: 16px;
+      padding: 1vw 1.1vw;
+      color: var(--text);
+      font-size: clamp(16px, 1.15vw, 22px);
+      line-height: 1.55;
+    }
+
+    @media (max-width: 1200px) {
+      .chapter-nav { max-width: 44vw; }
+    }
+
+    @media (max-aspect-ratio: 16/10) {
+      .app {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .deck {
+        width: 100vw;
+        height: calc(100vw * 10 / 16);
+        max-height: 100vh;
+        max-width: calc(100vh * 16 / 10);
+      }
+      .slide {
+        padding: 4.2vh 4.5vw 8vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="chapter-nav" id="chapterNav"></div>
+
+    <div class="deck" id="deck">
+
+      <!-- 1 Cover -->
+      <section class="slide cover active" data-title="封面" data-chapter="0">
+        <div class="hero">
+          <div class="eyebrow">AI Transformation Presentation</div>
+          <h1>AI 转型：从认知普及到业务落地</h1>
+          <div class="subtitle">
+            面向全球物流科技公司的演示文稿。<br>
+            聚焦 <span class="accent-blue">趋势</span>、<span class="accent-cyan">场景</span>、<span class="accent-orange">组织行动</span>，
+            帮助听众在进入细节之前，先快速抓住每一章的核心 punchline。
+          </div>
+          <div class="hero-badges">
+            <div class="badge">16:10 宽屏</div>
+            <div class="badge">深色背景</div>
+            <div class="badge">统一视觉风格</div>
+            <div class="badge">章节总览 + 细节页</div>
+            <div class="badge">左右键翻页</div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：这不是一场关于“新工具”的分享，而是一场关于<span class="accent-blue">工作方式正在如何变化</span>的分享。
+        </div>
+      </section>
+
+      <!-- 2 Agenda -->
+      <section class="slide" data-title="目录" data-chapter="0">
+        <div class="eyebrow">Agenda</div>
+        <h1>今天整场分享的结构</h1>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title">Part 1 · 建立共识</div>
+            <div class="list">
+              <div class="list-item"><span class="dot"></span><div class="body-text">为什么 AI 和每个人都有关</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">AI 转型的价值，以及物流科技行业趋势</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">从 Chatbot 到 Agent 到超级自动化</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">Part 2 · 走向落地</div>
+            <div class="list">
+              <div class="list-item"><span class="dot"></span><div class="body-text">全员可立即上手的通用场景</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">各职能部门与物流业务部门的优先场景</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">人和组织如何升级，以及最后的行动建议</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：整场内容会从<span class="accent-blue">“为什么要做”</span>一路走到<span class="accent-cyan">“具体怎么开始做”</span>。
+        </div>
+      </section>
+
+      <!-- CH1 Overview -->
+      <section class="slide" data-title="章节1总览" data-chapter="1">
+        <div class="eyebrow">Chapter 01 / Opening</div>
+        <h1>为什么 AI 和每个人都有关</h1>
+        <div class="subtitle">
+          这一轮变化，不只是多了一个新工具，而是
+          <span class="accent-blue">工作的方式、协作的方式、创造价值的方式</span>正在被重构。
+        </div>
+        <div class="grid-2">
+          <div class="panel">
+            <div class="panel-title">这一章先建立的共识</div>
+            <div class="list">
+              <div class="list-item"><span class="dot"></span><div class="body-text">AI 不是技术团队的专属话题，而是每个岗位都会逐步面对的新工作环境。</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">对全球物流科技公司来说，AI 不只意味着效率提升，也意味着客户体验、协同方式与产品能力重构。</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">今天最重要的问题，不是 AI 会不会来，而是我们能否更早把它变成自己的能力。</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">这一章听众需要带走的问题</div>
+            <div class="list">
+              <div class="list-item"><span class="dot"></span><div class="body-text">为什么 AI 不再只是“别人家的事”</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">为什么它会影响每一个岗位的工作方式</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">为什么现在开始尝试，比等一切都成熟后再跟进更重要</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：如果说过去数字化改变的是流程，那么这一轮 AI 改变的是<span class="accent-blue">每个人完成工作的方式</span>。
+        </div>
+      </section>
+
+      <!-- CH1 Detail -->
+      <section class="slide" data-title="章节1细节" data-chapter="1">
+        <div class="eyebrow">Chapter 01 / Detail</div>
+        <h1>为什么说这一次不是局部变化，而是普遍变化</h1>
+        <div class="grid-3">
+          <div class="panel">
+            <div class="panel-title">过去的技术升级</div>
+            <p>往往先进入少数专业团队，比如 IT、数据、研发，再慢慢外溢到其他部门。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">这一轮 AI 的不同</div>
+            <p>它首先进入的恰恰是最普遍的工作动作：写、搜、看、比、想、总结、沟通、整理。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">所以变化更快</div>
+            <p>因为它不要求每个人先学会编程，而是直接作用于知识工作者最日常的任务。</p>
+          </div>
+        </div>
+        <div class="quote-box">
+          对大多数员工来说，AI 的第一价值并不是“替代你”，而是“先让你做得更快、更完整、更有结构”。
+        </div>
+        <div class="punchline">
+          Punchline：AI 之所以会迅速普及，是因为它切入的不是边缘任务，而是<span class="accent-cyan">每个人每天都在做的任务</span>。
+        </div>
+      </section>
+
+      <!-- CH2 Overview -->
+      <section class="slide" data-title="章节2总览" data-chapter="2">
+        <div class="eyebrow">Chapter 02 / Value &amp; Industry</div>
+        <h1>AI 转型的价值，以及物流科技行业正在发生什么</h1>
+        <div class="metric-row">
+          <div class="metric">
+            <h3>效率</h3>
+            <p>更快完成高频、重复、信息密集型工作。</p>
+          </div>
+          <div class="metric">
+            <h3>质量</h3>
+            <p>输出更完整、更一致，并减少疏漏。</p>
+          </div>
+          <div class="metric">
+            <h3>增长</h3>
+            <p>把智能能力逐步变成客户体验与新服务能力。</p>
+          </div>
+          <div class="metric">
+            <h3>组织</h3>
+            <p>让知识、流程、协同与学习能力持续升级。</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title cyan">物流科技行业的变化方向</div>
+          <div class="two-col-list">
+            <div class="body-text">• 从自动化走向智能化：不只是执行规则，而是开始理解任务、辅助判断。</div>
+            <div class="body-text">• 从内部提效走向流程嵌入：客服、运营、控制塔、知识系统都在被重构。</div>
+            <div class="body-text">• 从单点工具走向系统能力：AI 不再只是一个窗口，而是越来越多接入业务流。</div>
+            <div class="body-text">• 从成本逻辑走向竞争逻辑：谁更早形成 AI 原生能力，谁更可能形成服务差异化。</div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：这一轮竞争，拼的不只是有没有 AI，而是谁更快把 AI 变成<span class="accent-blue">真实的工作能力、组织能力和客户能力</span>。
+        </div>
+      </section>
+
+      <!-- CH2 Detail -->
+      <section class="slide" data-title="章节2细节" data-chapter="2">
+        <div class="eyebrow">Chapter 02 / Detail</div>
+        <h1>AI 价值不是一个维度，而是四个维度同时展开</h1>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title">1. 效率价值</div>
+            <p>减少机械重复劳动，让团队把时间从整理信息、凑材料、写初稿，转移到更高价值的判断和沟通上。</p>
+            <div class="panel-title cyan" style="margin-top:1.2vh;">2. 质量价值</div>
+            <p>通过结构化输出、检查遗漏、统一表达，提高内容与流程的一致性。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">3. 增长价值</div>
+            <p>把 AI 从内部工具，逐步做成客户侧服务体验的一部分，例如智能客服、智能解释、智能建议。</p>
+            <div class="panel-title" style="margin-top:1.2vh;">4. 组织价值</div>
+            <p>最难、也最长期的部分，是让企业知识沉淀、跨系统连接、流程协作方式一起升级。</p>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：企业真正要追求的，不是一次性效率红利，而是把 AI 变成<span class="accent-orange">持续复利的组织能力</span>。
+        </div>
+      </section>
+
+      <!-- CH3 Overview -->
+      <section class="slide" data-title="章节3总览" data-chapter="3">
+        <div class="eyebrow">Chapter 03 / Evolution</div>
+        <h1>从 Chatbot 到 Agent，再到超级自动化</h1>
+        <div class="grid-4">
+          <div class="step-card">
+            <div class="step-no">STEP 01</div>
+            <h3>Chatbot</h3>
+            <p>先解决问答、总结、写作、翻译，让每个人第一次拥有 AI 助手。</p>
+            <div class="tag">会回答、会生成</div>
+          </div>
+          <div class="step-card">
+            <div class="step-no">STEP 02</div>
+            <h3>推理型模型</h3>
+            <p>开始拆解问题、归纳逻辑、辅助分析与判断。</p>
+            <div class="tag">会思考、会拆解</div>
+          </div>
+          <div class="step-card">
+            <div class="step-no">STEP 03</div>
+            <h3>Agent / 工作流</h3>
+            <p>开始调用工具、查询系统、串联步骤，从“会说”逐步走向“能做”。</p>
+            <div class="tag">会执行、会调用</div>
+          </div>
+          <div class="step-card">
+            <div class="step-no">STEP 04</div>
+            <h3>超级自动化</h3>
+            <p>个人生产力开始从工具增强走向流程自动化。</p>
+            <div class="tag">会编排、会自动化</div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：AI 应用的真正方向，是从“能回答”走向“能推理”，再走向“能执行”和“能编排”；企业不能只停留在<span class="accent-blue">聊天机器人阶段</span>。
+        </div>
+      </section>
+
+      <!-- CH3 Detail -->
+      <section class="slide" data-title="章节3细节" data-chapter="3">
+        <div class="eyebrow">Chapter 03 / Detail</div>
+        <h1>为什么企业不能把 Chatbot 当作终点</h1>
+        <div class="grid-3">
+          <div class="panel">
+            <div class="panel-title">Chatbot 的价值</div>
+            <p>降低使用门槛，快速让员工看到 AI 能力，适合认知普及与初期提效。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">Agent 的突破</div>
+            <p>把“会说”变成“能做”，能跨工具、跨步骤执行任务，开始形成工作闭环。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">超级自动化的意义</div>
+            <p>把多个 Agent、规则、系统接口和人工审核串联起来，形成可复用的智能流程。</p>
+          </div>
+        </div>
+        <div class="quote-box">
+          如果 Chatbot 解决的是“我能不能问 AI”，那么 Agent 解决的是“AI 能不能帮我把事做完一大半”。
+        </div>
+        <div class="punchline">
+          Punchline：面向企业落地，价值最高的不是“会聊天的 AI”，而是<span class="accent-cyan">能进入工作流的 AI</span>。
+        </div>
+      </section>
+
+      <!-- CH4 Overview -->
+      <section class="slide" data-title="章节4总览" data-chapter="4">
+        <div class="eyebrow">Chapter 04 / Everyone Can Start</div>
+        <h1>所有员工都可以立刻开始的 AI 场景</h1>
+        <div class="subtitle">
+          最好的起点，不是最复杂的工作，而是那些
+          <span class="accent-blue">高频、重复、耗时、又经常需要从零开始</span>的任务。
+        </div>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title">写作与表达</div>
+            <p>邮件初稿、会议纪要、汇报提纲、多语言改写、制度说明优化。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">思考与方案</div>
+            <p>问题拆解、分析框架、复盘结构、竞品整理、头脑风暴。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title">报表与分析辅助</div>
+            <p>指标解释、异常归因、经营摘要、公式与 SQL 辅助、业务语言翻译。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">图示与汇报材料</div>
+            <p>PPT 大纲、图示思路、一页纸总结、可视化表达建议。</p>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：AI 最适合切入的，不是你最复杂的工作，而是你最常做、最耗时、最容易重复的工作。
+        </div>
+      </section>
+
+      <!-- CH4 Detail -->
+      <section class="slide" data-title="章节4细节" data-chapter="4">
+        <div class="eyebrow">Chapter 04 / Detail</div>
+        <h1>全员上手的一个简单判断方法：四个“高”</h1>
+        <div class="grid-4">
+          <div class="panel">
+            <div class="big-kpi">高频</div>
+            <p>每周都会做，最好每天都可能做。</p>
+          </div>
+          <div class="panel">
+            <div class="big-kpi">高重复</div>
+            <p>流程类似、结构相似、经常从模板开始。</p>
+          </div>
+          <div class="panel">
+            <div class="big-kpi">高耗时</div>
+            <p>虽然不难，但要花很多时间整理与组织。</p>
+          </div>
+          <div class="panel">
+            <div class="big-kpi">高标准化潜力</div>
+            <p>可以逐步固化为提示词、模板、流程或助手。</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title cyan">一个 practical 的起步方法</div>
+          <p>先选一个任务，用 AI 做一次；再对比你原来的做法；最后沉淀成团队可复用的模板。不要一上来追求“颠覆”，先追求“稳定地节省 20%～40% 时间”。</p>
+        </div>
+        <div class="punchline">
+          Punchline：真正容易成功的试点，不是最炫的场景，而是<span class="accent-blue">最容易稳定复用的场景</span>。
+        </div>
+      </section>
+
+      <!-- CH5 Overview -->
+      <section class="slide" data-title="章节5总览" data-chapter="5">
+        <div class="eyebrow">Chapter 05 / Functional Teams</div>
+        <h1>各职能部门最容易起步的 AI 场景</h1>
+        <div class="grid-5">
+          <div class="panel">
+            <div class="panel-title">销售 / 商务</div>
+            <div class="body-text">客户背景摘要<br>销售邮件与话术<br>招投标内容辅助<br>多语言沟通支持</div>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">客服 / 客成</div>
+            <div class="body-text">工单摘要<br>客户回复草稿<br>FAQ 智能问答<br>客诉分类建议</div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">HR / 培训 / 行政</div>
+            <div class="body-text">JD 与面试题<br>培训资料整理<br>制度说明生成<br>员工问答助手</div>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">财务 / 法务 / 结算</div>
+            <div class="body-text">合同要点提取<br>对账异常说明<br>报表摘要生成<br>流程解释问答</div>
+          </div>
+          <div class="panel">
+            <div class="panel-title">产品 / 技术 / 研发</div>
+            <div class="body-text">PRD 初稿<br>反馈归类<br>测试用例生成<br>技术文档整理</div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：每个部门都能找到自己的 low hanging fruit，关键不是“要不要做”，而是<span class="accent-blue">先从哪个高频场景开始做</span>。
+        </div>
+      </section>
+
+      <!-- CH5 Detail -->
+      <section class="slide" data-title="章节5细节" data-chapter="5">
+        <div class="eyebrow">Chapter 05 / Detail</div>
+        <h1>部门场景怎么排序：不是看想象力，而是看落地条件</h1>
+        <div class="table-like">
+          <div class="row-card header">
+            <div>筛选维度</div>
+            <div>优先做什么</div>
+            <div>为什么</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">频率</div>
+            <div class="body-text">每周反复发生的任务</div>
+            <div class="body-text">更容易累计真实收益</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">标准化程度</div>
+            <div class="body-text">输入、输出相对可定义的任务</div>
+            <div class="body-text">更容易做模板和复用</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">风险</div>
+            <div class="body-text">允许人工审核兜底的任务</div>
+            <div class="body-text">更适合作为第一批试点</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">价值可见性</div>
+            <div class="body-text">时间节省、质量提升容易衡量的任务</div>
+            <div class="body-text">更容易获得组织支持</div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：low hanging fruit 的核心，不是“看起来高级”，而是<span class="accent-cyan">容易成功、容易复制、容易量化</span>。
+        </div>
+      </section>
+
+      <!-- CH6 Overview -->
+      <section class="slide" data-title="章节6总览" data-chapter="6">
+        <div class="eyebrow">Chapter 06 / Core Business Scenarios</div>
+        <h1>物流业务部门最值得优先推进的 AI 场景</h1>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title cyan">订单 / 运单异常摘要</div>
+            <p>自动汇总多系统、多节点的信息，快速生成异常全貌、原因和处理建议。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title">运营控制塔智能副驾</div>
+            <p>识别节点风险、延误信号和异常模式，帮助运营团队更快定位和响应问题。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">客户智能服务助手</div>
+            <p>支持多语言问答、状态说明、流程解释，减少重复咨询并提升客户体验。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title">企业知识中枢</div>
+            <p>把 SOP、制度、产品资料、培训内容统一为可问、可查、可复用的知识入口。</p>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：对物流科技公司来说，AI 最有价值的地方，往往不是单点写作工具，而是把<span class="accent-blue">信息、流程、协同和异常处理</span>连接起来。
+        </div>
+      </section>
+
+      <!-- CH6 Detail -->
+      <section class="slide" data-title="章节6细节" data-chapter="6">
+        <div class="eyebrow">Chapter 06 / Detail</div>
+        <h1>为什么这些业务场景优先级更高</h1>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title">它们都具备 3 个共性</div>
+            <div class="list">
+              <div class="list-item"><span class="dot"></span><div class="body-text">信息分散在多个系统和节点中，人工汇总成本高。</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">需要高频解释、沟通、同步，重复劳动非常重。</div></div>
+              <div class="list-item"><span class="dot"></span><div class="body-text">一旦更快发现异常、解释异常、处理异常，就能明显改善客户体验。</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">这意味着什么</div>
+            <p>这些场景同时具备“提效价值”和“客户价值”。它们不是纯后台优化，而是能直接推动服务差异化的能力建设。</p>
+          </div>
+        </div>
+        <div class="quote-box">
+          在物流业务里，信息延迟本身就是成本；异常解释不清，本身就是体验问题。
+        </div>
+        <div class="punchline">
+          Punchline：优先级最高的业务场景，往往是那些能同时改进<span class="accent-cyan">内部效率</span>与<span class="accent-orange">外部体验</span>的场景。
+        </div>
+      </section>
+
+      <!-- CH7 Overview -->
+      <section class="slide" data-title="章节7总览" data-chapter="7">
+        <div class="eyebrow">Chapter 07 / People &amp; Organization</div>
+        <h1>人和组织怎么变：超级个体、协作升级与治理重点</h1>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title">人和 AI 的新分工</div>
+            <p>AI 更擅长速度、生成、归纳、重复任务；人更擅长判断、责任、关系、创造和价值取舍。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">超级个体的启示</div>
+            <p>借助 AI，一个人和一个小团队都可能拥有过去更大团队才有的产出能力。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title">员工需要升级的能力</div>
+            <p>问题定义、AI 协作、判断校验、跨部门整合。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">组织要补上的能力</div>
+            <p>试点机制、知识连接、流程编排、权限治理和责任边界。</p>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：AI 越强，人越要把精力放在<span class="accent-blue">判断、责任、协同和创造</span>上；企业越要把个体创新沉淀成组织能力。
+        </div>
+      </section>
+
+      <!-- CH7 Detail -->
+      <section class="slide" data-title="章节7细节" data-chapter="7">
+        <div class="eyebrow">Chapter 07 / Detail</div>
+        <h1>组织升级的关键，不只是教会大家用工具</h1>
+        <div class="grid-3">
+          <div class="panel">
+            <div class="panel-title">第一层：工具普及</div>
+            <p>让大家会问、会试、会用，是起点，但不是终点。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">第二层：方法沉淀</div>
+            <p>把优秀提示词、模板、流程、案例库沉淀下来，让好方法可复制。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title orange">第三层：组织机制</div>
+            <p>建立试点、复盘、推广、审核、权限与风险治理，让能力真正进入组织。</p>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：企业如果只停留在“鼓励大家试试 AI”，最终只会得到零散实践；只有把经验沉淀为机制，才会形成<span class="accent-orange">组织复利</span>。
+        </div>
+      </section>
+
+      <!-- CH8 Overview -->
+      <section class="slide" data-title="章节8总览" data-chapter="8">
+        <div class="eyebrow">Chapter 08 / Future Outlook</div>
+        <h1>未来趋势：拥抱技术，但不要制造焦虑</h1>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title orange">趋势 1</div>
+            <p>AI 会从工具层走向工作层、流程层、协同层，越来越深地嵌入日常工作。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title">趋势 2</div>
+            <p>模型会越来越普及，真正拉开差距的是数据连接、知识沉淀、工作流设计和治理能力。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">趋势 3</div>
+            <p>岗位不会简单消失，但任务结构会重构，重复性部分减少，判断与协作部分上升。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title">正确心态</div>
+            <p>不神化 AI，不回避 AI，不空谈 AI；先开始使用，在使用中建立判断，在判断中形成能力。</p>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：面对 AI，最好的态度不是恐惧，也不是盲从，而是<span class="accent-orange">理解它、试用它、驾驭它</span>，把它变成自己的能力。
+        </div>
+      </section>
+
+      <!-- CH8 Detail -->
+      <section class="slide" data-title="章节8细节" data-chapter="8">
+        <div class="eyebrow">Chapter 08 / Detail</div>
+        <h1>对未来最需要避免的两个误区</h1>
+        <div class="grid-2-even">
+          <div class="panel">
+            <div class="panel-title orange">误区 1：过度焦虑</div>
+            <p>把 AI 直接理解成“岗位消失器”，会让组织在情绪上先失衡，反而不利于有效推进能力升级。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">误区 2：过度轻视</div>
+            <p>把 AI 理解成“又一个热点工具”，会让企业错过形成流程优势与组织优势的窗口期。</p>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">更好的判断框架</div>
+          <p>把 AI 看作一种新的生产力基础设施：它短期先改变任务执行，中期改变流程协作，长期改变组织竞争力。</p>
+        </div>
+        <div class="punchline">
+          Punchline：真正成熟的态度，不是高估短期、也不是低估长期，而是稳步推进，把变化转化为<span class="accent-blue">能力积累</span>。
+        </div>
+      </section>
+
+      <!-- CH9 Overview -->
+      <section class="slide" data-title="章节9总览" data-chapter="9">
+        <div class="eyebrow">Chapter 09 / Call To Action</div>
+        <h1>从今天开始：让每个人找到自己的第一个 AI 场景</h1>
+        <div class="subtitle">
+          AI 转型不是从宏大叙事开始，而是从每个人、每个团队找到第一个有效场景开始。
+        </div>
+        <div class="grid-3">
+          <div class="panel">
+            <div class="panel-title orange">Action 01 · 对个人</div>
+            <p>找到 1–2 个高频、重复、耗时任务，先试着用 AI 做出更快、更好的版本。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title cyan">Action 02 · 对部门</div>
+            <p>识别 3–5 个 low hanging fruit，优先做高频、痛点强、可量化、容易试点的场景。</p>
+          </div>
+          <div class="panel">
+            <div class="panel-title">Action 03 · 对公司</div>
+            <p>从认知普及走向试点复制，再走向知识中枢、流程嵌入和产品化能力建设。</p>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：真正的 AI 转型，不是知道很多概念，而是让每一个岗位都找到<span class="accent-orange">第一个有效场景</span>，让每一个团队都跑出<span class="accent-orange">第一个成功样板</span>。
+        </div>
+      </section>
+
+      <!-- CH9 Detail -->
+      <section class="slide" data-title="章节9细节" data-chapter="9">
+        <div class="eyebrow">Chapter 09 / Detail</div>
+        <h1>一个建议的推进路径：从个人试用到组织复制</h1>
+        <div class="table-like">
+          <div class="row-card header">
+            <div>阶段</div>
+            <div>重点动作</div>
+            <div>目标</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">阶段 1</div>
+            <div class="body-text">个人尝试：找高频任务、做第一次实践</div>
+            <div class="body-text">建立真实体感</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">阶段 2</div>
+            <div class="body-text">部门试点：做 3–5 个场景，量化节省与质量提升</div>
+            <div class="body-text">形成成功样板</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">阶段 3</div>
+            <div class="body-text">组织沉淀：模板、知识库、流程、治理机制</div>
+            <div class="body-text">形成复用能力</div>
+          </div>
+          <div class="row-card">
+            <div class="body-text">阶段 4</div>
+            <div class="body-text">系统嵌入：把 AI 接入产品、运营与客户服务流程</div>
+            <div class="body-text">形成竞争优势</div>
+          </div>
+        </div>
+        <div class="punchline">
+          Punchline：最好的推进方式不是“一步到位”，而是先跑小闭环，再做复制，最后把试点变成<span class="accent-cyan">系统能力</span>。
+        </div>
+      </section>
+
+      <!-- Closing -->
+      <section class="slide" data-title="结束页" data-chapter="10">
+        <div class="eyebrow">Closing</div>
+        <h1>最后一句话</h1>
+        <div class="subtitle">
+          AI 不会自动创造价值。<br>
+          真正创造价值的，是企业如何把它接入<span class="accent-blue">人的工作</span>、<span class="accent-cyan">团队的流程</span>与<span class="accent-orange">组织的能力</span>。
+        </div>
+        <div class="panel">
+          <div class="panel-title">你可以如何结束这场分享</div>
+          <p>“我们今天不是来讨论 AI 会不会来，而是来讨论：我们准备怎样更主动地使用它、理解它，并把它变成我们自己的能力。”</p>
+        </div>
+        <div class="punchline">
+          Punchline：先开始的人，不一定一开始最完美；但更可能更早形成<span class="accent-blue">认知优势、流程优势和组织优势</span>。
+        </div>
+      </section>
+    </div>
+
+    <div class="footer-ui">
+      <div class="progress-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <div class="footer-row">
+        <div id="slideInfo">1 / 1</div>
+        <div class="controls">
+          <button class="btn" id="prevBtn">← 上一页</button>
+          <button class="btn" id="nextBtn">下一页 →</button>
+        </div>
+        <div class="small">快捷键：← → / Home / End</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progressBar = document.getElementById('progressBar');
+    const slideInfo = document.getElementById('slideInfo');
+    const chapterNav = document.getElementById('chapterNav');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    let current = 0;
+
+    const chapterMap = [
+      { chapter: 0, label: '封面/目录', slideIndex: 0 },
+      { chapter: 1, label: '01 开场', slideIndex: slides.findIndex(s => s.dataset.chapter === '1') },
+      { chapter: 2, label: '02 价值与趋势', slideIndex: slides.findIndex(s => s.dataset.chapter === '2') },
+      { chapter: 3, label: '03 Chatbot→Agent', slideIndex: slides.findIndex(s => s.dataset.chapter === '3') },
+      { chapter: 4, label: '04 全员场景', slideIndex: slides.findIndex(s => s.dataset.chapter === '4') },
+      { chapter: 5, label: '05 职能部门', slideIndex: slides.findIndex(s => s.dataset.chapter === '5') },
+      { chapter: 6, label: '06 物流业务', slideIndex: slides.findIndex(s => s.dataset.chapter === '6') },
+      { chapter: 7, label: '07 人与组织', slideIndex: slides.findIndex(s => s.dataset.chapter === '7') },
+      { chapter: 8, label: '08 未来趋势', slideIndex: slides.findIndex(s => s.dataset.chapter === '8') },
+      { chapter: 9, label: '09 行动建议', slideIndex: slides.findIndex(s => s.dataset.chapter === '9') },
+      { chapter: 10, label: '结束', slideIndex: slides.findIndex(s => s.dataset.chapter === '10') }
+    ];
+
+    function buildChapterNav() {
+      chapterMap.forEach(item => {
+        const chip = document.createElement('button');
+        chip.className = 'chapter-chip';
+        chip.textContent = item.label;
+        chip.addEventListener('click', () => goTo(item.slideIndex));
+        chip.dataset.chapter = item.chapter;
+        chapterNav.appendChild(chip);
+      });
+    }
+
+    function updateChapterNav() {
+      const currentChapter = slides[current].dataset.chapter;
+      Array.from(chapterNav.children).forEach(chip => {
+        chip.classList.toggle('active', chip.dataset.chapter === currentChapter);
+      });
+    }
+
+    function render() {
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+      const progress = ((current + 1) / slides.length) * 100;
+      progressBar.style.width = progress + '%';
+      slideInfo.textContent = `${current + 1} / ${slides.length} · ${slides[current].dataset.title || ''}`;
+      updateChapterNav();
+    }
+
+    function goTo(index) {
+      current = Math.max(0, Math.min(index, slides.length - 1));
+      render();
+    }
+
+    function next() {
+      if (current < slides.length - 1) {
+        current++;
+        render();
+      }
+    }
+
+    function prev() {
+      if (current > 0) {
+        current--;
+        render();
+      }
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') next();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') prev();
+      if (e.key === 'Home') goTo(0);
+      if (e.key === 'End') goTo(slides.length - 1);
+    });
+
+    prevBtn.addEventListener('click', prev);
+    nextBtn.addEventListener('click', next);
+
+    buildChapterNav();
+    render();
+  </script>
+
+
+</body></html>

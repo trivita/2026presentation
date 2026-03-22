@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1600">
+<title>智能进化速度对比 · 宽屏版</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+  :root {
+    --bg:    #00040d;
+    --panel: #03081a;
+    --human: #00d4ff;
+    --ai:    #c084fc;
+    --chip:  #00ffb3;
+    --accent:#ffb300;
+    --text:  #f0f6ff;
+    --muted: #6b80a0;
+    --border:rgba(255,255,255,0.08);
+
+    /* fixed 16:10 canvas */
+    --vw: 1600px;
+    --vh: 1000px;
+    --ff: 'DM Sans', 'Noto Sans SC', sans-serif;
+  }
+
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width: var(--vw);
+    height: var(--vh);
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ff);
+  }
+
+  /* ── PARTICLES ── */
+  #particles {
+    position: absolute; inset: 0;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── ROOT LAYOUT ── */
+  .root {
+    position: relative; z-index: 1;
+    width: var(--vw); height: var(--vh);
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    grid-template-rows: 82px 1fr 136px;
+    grid-template-areas:
+      "header  header"
+      "chart   panel"
+      "footer  panel";
+    gap: 0;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    grid-area: header;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 36px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(7,14,28,0.9) 0%, transparent 100%);
+    animation: fadeDown 0.9s ease both;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+  }
+
+  .logo {
+    font-family: var(--ff);
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(120deg, #ffffff, #a8c0e0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+  }
+
+  .header-sub {
+    font-size: 14px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    font-weight: 500;
+  }
+
+  .header-legend {
+    display: flex;
+    gap: 28px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  .leg-line {
+    position: relative;
+    width: 36px;
+    height: 3px;
+    border-radius: 2px;
+  }
+  .leg-line::after {
+    content: '';
+    position: absolute;
+    right: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: inherit;
+  }
+
+  .header-badge {
+    font-family: var(--ff);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--accent);
+    opacity: 0.9;
+  }
+
+  /* ── CHART AREA ── */
+  .chart-area {
+    grid-area: chart;
+    position: relative;
+    padding: 24px 16px 8px 70px;
+    overflow: hidden;
+  }
+
+  .y-axis-label {
+    position: absolute;
+    left: 10px; top: 50%;
+    transform: translateY(-50%) rotate(-90deg);
+    font-family: var(--ff);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  #chart {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* ── RIGHT PANEL ── */
+  .panel {
+    grid-area: panel;
+    border-left: 1px solid var(--border);
+    background: var(--panel);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeLeft 0.9s 0.2s ease both;
+  }
+
+  .panel-section {
+    padding: 20px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title {
+    font-family: var(--ff);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    text-transform: uppercase;
+  }
+
+  /* Stats */
+  .stat-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .stat-row:last-child { margin: 0; }
+
+  .stat-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    opacity: 0.7;
+  }
+
+  .stat-val {
+    font-family: var(--ff);
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  /* Timeline milestones */
+  .timeline {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 22px;
+    scrollbar-width: none;
+  }
+  .timeline::-webkit-scrollbar { display: none; }
+
+  .tl-item {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 12px;
+    margin-bottom: 14px;
+    align-items: start;
+  }
+
+  .tl-year {
+    font-family: var(--ff);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+    padding-top: 2px;
+    text-align: right;
+  }
+
+  .tl-body {
+    border-left: 2px solid;
+    padding-left: 10px;
+    padding-bottom: 2px;
+  }
+
+  .tl-event {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .tl-tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    opacity: 0.65;
+    margin-top: 3px;
+  }
+
+  /* Hover readout */
+  .readout {
+    padding: 16px 22px;
+    border-top: 1px solid var(--border);
+    background: rgba(0,0,0,0.2);
+  }
+
+  .readout-year {
+    font-family: var(--ff);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .readout-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+  .readout-label { color: var(--muted); font-weight: 500; }
+  .readout-val   { font-family: var(--ff); font-size: 13px; font-weight: 800; }
+
+  /* ── FOOTER ── */
+  .footer {
+    grid-area: footer;
+    border-top: 1px solid var(--border);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    animation: fadeUp 0.9s 0.4s ease both;
+  }
+
+  .footer-card {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .footer-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0.7;
+  }
+  .footer-card.human::before { background: linear-gradient(90deg, transparent, var(--human), transparent); }
+  .footer-card.chip::before  { background: linear-gradient(90deg, transparent, var(--chip),  transparent); }
+  .footer-card.ai::before    { background: linear-gradient(90deg, transparent, var(--ai),    transparent); }
+
+  .fc-label {
+    font-family: var(--ff);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: var(--muted);
+    margin-bottom: 7px;
+    text-transform: uppercase;
+  }
+
+  .fc-value {
+    font-family: var(--ff);
+    font-size: 34px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 5px;
+  }
+
+  .fc-sub {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    opacity: 0.55;
+    letter-spacing: 0.3px;
+  }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-18px); } to { opacity:1; transform:none; } }
+  @keyframes fadeUp   { from { opacity:0; transform:translateY(18px);  } to { opacity:1; transform:none; } }
+  @keyframes fadeLeft { from { opacity:0; transform:translateX(18px);  } to { opacity:1; transform:none; } }
+
+  /* scan line overlay */
+  .scanlines {
+    position: fixed; inset: 0; z-index: 2;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+  }
+</style>
+</head>
+<body>
+
+<canvas id="particles"></canvas>
+<div class="scanlines"></div>
+
+<div class="root">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">智能进化速度对比</div>
+      <div class="header-sub">INTELLIGENCE EVOLUTION · 1975 – 2030</div>
+    </div>
+    <div class="header-legend">
+      <div class="legend-item">
+        <div class="leg-line" style="background:var(--human)"></div>
+        <span style="color:var(--human)">人类智能</span>
+        <span style="color:var(--muted);font-size:10px">Flynn IQ指数</span>
+      </div>
+      <div class="legend-item">
+        <div class="leg-line" style="background:var(--chip)"></div>
+        <span style="color:var(--chip)">算力芯片</span>
+        <span style="color:var(--muted);font-size:10px">摩尔定律 × AI芯片</span>
+      </div>
+      <div class="legend-item">
+        <div class="leg-line" style="background:var(--ai)"></div>
+        <span style="color:var(--ai)">大语言模型</span>
+        <span style="color:var(--muted);font-size:10px">基准测试综合</span>
+      </div>
+    </div>
+    <div class="header-badge">▶ 对数刻度 · LOG SCALE</div>
+  </header>
+
+  <!-- CHART -->
+  <div class="chart-area">
+    <div class="y-axis-label">相对进化指数（对数）</div>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <aside class="panel">
+    <div class="panel-section">
+      <div class="panel-title">◈ 核心数据</div>
+      <div class="stat-row">
+        <span class="stat-name">人类智能 50年增幅</span>
+        <span class="stat-val" style="color:var(--human)">+15%</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">芯片算力 50年增幅</span>
+        <span class="stat-val" style="color:var(--chip)">10⁶ ×</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">大模型 2017–2025</span>
+        <span class="stat-val" style="color:var(--ai)">10⁴ ×</span>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="panel-title">◈ 关键拐点时间线</div>
+
+      <div class="tl-item">
+        <div class="tl-year">1975</div>
+        <div class="tl-body" style="border-color:var(--chip)">
+          <div class="tl-event">Intel 8080 发布，个人电脑时代开端</div>
+          <div class="tl-tag" style="color:var(--chip)">CHIP · 晶体管数 6K</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">1984</div>
+        <div class="tl-body" style="border-color:var(--human)">
+          <div class="tl-event">James Flynn 确立 Flynn 效应：IQ 每十年稳定上升约 3 点</div>
+          <div class="tl-tag" style="color:var(--human)">HUMAN · 教育与营养驱动</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2006</div>
+        <div class="tl-body" style="border-color:var(--chip)">
+          <div class="tl-event">NVIDIA 发布 CUDA，GPU 并行计算开启 AI 训练新纪元</div>
+          <div class="tl-tag" style="color:var(--chip)">CHIP · 并行算力拐点</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2012</div>
+        <div class="tl-body" style="border-color:var(--human)">
+          <div class="tl-event">Flynn 效应趋于平缓，发达国家 IQ 增速减弱</div>
+          <div class="tl-tag" style="color:var(--human)">HUMAN · 增速拐点</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2016</div>
+        <div class="tl-body" style="border-color:var(--chip)">
+          <div class="tl-event">Google TPU v1 量产，专用 AI 芯片开始颠覆摩尔定律曲线</div>
+          <div class="tl-tag" style="color:var(--chip)">CHIP · AI加速元年</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2017</div>
+        <div class="tl-body" style="border-color:var(--ai)">
+          <div class="tl-event">Attention Is All You Need · Transformer 架构诞生</div>
+          <div class="tl-tag" style="color:var(--ai)">AI · 奇点前夜</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2020</div>
+        <div class="tl-body" style="border-color:var(--ai)">
+          <div class="tl-event">GPT-3 发布，1750 亿参数，少样本学习震撼业界</div>
+          <div class="tl-tag" style="color:var(--ai)">AI · 规模涌现</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2022</div>
+        <div class="tl-body" style="border-color:var(--ai)">
+          <div class="tl-event">ChatGPT 发布，NVIDIA H100 上市，AI + 芯片双重爆发</div>
+          <div class="tl-tag" style="color:var(--ai)">AI × CHIP · 双重拐点</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year">2024</div>
+        <div class="tl-body" style="border-color:var(--ai)">
+          <div class="tl-event">顶级模型在 MMLU、Bar Exam、医学考试全面超越人类平均水平</div>
+          <div class="tl-tag" style="color:var(--ai)">AI · 超越人类均值</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-year" style="color:var(--accent)">2025+</div>
+        <div class="tl-body" style="border-color:var(--accent)">
+          <div class="tl-event">预测：AI 辅助认知增强使人类有效智能重新加速</div>
+          <div class="tl-tag" style="color:var(--accent)">FORECAST · 虚线区域</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE READOUT -->
+    <div class="readout" id="readout">
+      <div class="readout-year" id="ro-year">— 悬停图表查看数值 —</div>
+      <div class="readout-row">
+        <span class="readout-label" style="color:var(--human)">人类智能</span>
+        <span class="readout-val" style="color:var(--human)" id="ro-human">—</span>
+      </div>
+      <div class="readout-row">
+        <span class="readout-label" style="color:var(--chip)">算力芯片</span>
+        <span class="readout-val" style="color:var(--chip)" id="ro-chip">—</span>
+      </div>
+      <div class="readout-row">
+        <span class="readout-label" style="color:var(--ai)">大语言模型</span>
+        <span class="readout-val" style="color:var(--ai)" id="ro-ai">—</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-card human">
+      <div class="fc-label">人类智能 · HUMAN IQ</div>
+      <div class="fc-value" style="color:var(--human)">线性</div>
+      <div class="fc-sub">50年 +15% · Flynn效应 · 约每代 3pt</div>
+    </div>
+    <div class="footer-card chip">
+      <div class="fc-label">算力芯片 · SILICON</div>
+      <div class="fc-value" style="color:var(--chip)">指数²</div>
+      <div class="fc-sub">摩尔定律 × AI专用芯片加速 · 50年 10⁶×</div>
+    </div>
+    <div class="footer-card ai">
+      <div class="fc-label">大语言模型 · LLM</div>
+      <div class="fc-value" style="color:var(--ai)">垂直</div>
+      <div class="fc-sub">8年从无到超人 · 2017→2025 涌现式跃升</div>
+    </div>
+  </footer>
+
+</div><!-- .root -->
+
+<script>
+// ============================================================
+// PARTICLES
+// ============================================================
+(function() {
+  const c = document.getElementById('particles');
+  const x = c.getContext('2d');
+  c.width  = 1600; c.height = 1000;
+
+  const pts = Array.from({length:180}, () => ({
+    px: Math.random(), py: Math.random(),
+    vx: (Math.random()-.5)*0.00015, vy: (Math.random()-.5)*0.00015,
+    r:  Math.random()*1.4+.3,
+    a:  Math.random()*.35+.05,
+    hue: [Math.random()<.33?'38,189,248':Math.random()<.5?'177,151,252':'45,212,170'][0]
+  }));
+
+  function frame() {
+    x.clearRect(0,0,1600,1000);
+    pts.forEach(p => {
+      p.px += p.vx; p.py += p.vy;
+      if(p.px<0)p.px=1; if(p.px>1)p.px=0;
+      if(p.py<0)p.py=1; if(p.py>1)p.py=0;
+      x.beginPath();
+      x.arc(p.px*1600, p.py*1000, p.r, 0, Math.PI*2);
+      x.fillStyle = `rgba(${p.hue},${p.a})`;
+      x.fill();
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+// ============================================================
+// CHART
+// ============================================================
+(function() {
+  const canvas  = document.getElementById('chart');
+  const ctx     = canvas.getContext('2d');
+  const roYear  = document.getElementById('ro-year');
+  const roHuman = document.getElementById('ro-human');
+  const roChip  = document.getElementById('ro-chip');
+  const roAi    = document.getElementById('ro-ai');
+
+  const START = 1975, END = 2030, PRED = 2025;
+  const PAD   = { top:28, right:32, bottom:44, left:8 };
+  const LOG_MAX = 9;
+
+  // ── DATA FUNCTIONS ──
+  function humanIdx(y) {
+    if (y <= 2012) return 1 + (y - START) * 0.003;
+    const b = 1 + (2012 - START) * 0.003;
+    if (y <= 2025) return b + (y - 2012) * 0.001;
+    return b + (2025 - 2012) * 0.001 + (y - 2025) * 0.004;
+  }
+  function chipIdx(y) {
+    const moore = Math.pow(2, (y - START) / 2);
+    if (y < 2016) return moore;
+    return moore * Math.pow(3, (y - 2016) / 2);
+  }
+  function aiIdx(y) {
+    if (y < 2017) return 1 + (y - START) * 0.01;
+    const b = 1 + (2017 - START) * 0.01;
+    return b * Math.pow(10, (y - 2017) * 0.55);
+  }
+
+  const years = [];
+  for (let y = START; y <= END; y += 0.25) years.push(y);
+  const humanData = years.map(y => ({ yr:y, val:humanIdx(y) }));
+  const chipData  = years.map(y => ({ yr:y, val:chipIdx(y) }));
+  const aiData    = years.map(y => ({ yr:y, val:aiIdx(y) }));
+
+  // ── SIZING ──
+  let W, H, DPR;
+  function resize() {
+    DPR = window.devicePixelRatio || 1;
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = rect.width - PAD.left - 8;
+    H = rect.height - PAD.top - 4;
+    canvas.width  = (W + PAD.left + PAD.right) * DPR;
+    canvas.height = (H + PAD.top  + PAD.bottom) * DPR;
+    canvas.style.width  = (W + PAD.left + PAD.right) + 'px';
+    canvas.style.height = (H + PAD.top  + PAD.bottom) + 'px';
+    ctx.scale(DPR, DPR);
+    drawAll(animProg);
+  }
+
+  const pW = () => W - PAD.right;
+  const pH = () => H - PAD.bottom;
+
+  function xP(yr)  { return PAD.left + (yr - START) / (END - START) * pW(); }
+  function yP(val) {
+    const log = Math.log10(Math.max(val, 1));
+    const t   = Math.min(Math.max(log / LOG_MAX, 0), 1);
+    return PAD.top + (1 - t) * pH();
+  }
+
+  // ── GRID ──
+  function drawGrid() {
+    ctx.save();
+    const logTicks  = [0,1,2,3,4,5,6,7,8,9];
+    const logLabels = ['1×','10×','100×','1K×','10K×','100K×','1M×','10M×','100M×','1B×'];
+
+    logTicks.forEach((lv, i) => {
+      const y = PAD.top + (1 - lv / LOG_MAX) * pH();
+      ctx.beginPath();
+      ctx.moveTo(PAD.left, y); ctx.lineTo(PAD.left + pW(), y);
+      ctx.strokeStyle = lv === 0 ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.055)';
+      ctx.lineWidth   = lv === 0 ? 1.5 : 1;
+      ctx.stroke();
+
+      ctx.fillStyle = lv === 0 ? 'rgba(200,215,240,0.9)' : 'rgba(107,128,160,0.85)';
+      ctx.font = `bold 12px 'DM Sans', 'Noto Sans SC', sans-serif`;
+      ctx.textAlign = 'right';
+      ctx.fillText(logLabels[i], PAD.left - 6, y + 4);
+    });
+
+    // Vertical: decade + key years
+    const keyYears = [1975,1980,1990,2000,2006,2010,2012,2016,2017,2020,2022,2025,2030];
+    const labelSet = new Set([1975,1985,1995,2005,2015,2017,2022,2025,2030]);
+
+    keyYears.forEach(yr => {
+      const x = xP(yr);
+      const isPred = yr >= PRED;
+      ctx.beginPath();
+      ctx.setLineDash(isPred ? [5,7] : []);
+      ctx.moveTo(x, PAD.top); ctx.lineTo(x, PAD.top + pH());
+      ctx.strokeStyle = isPred ? 'rgba(255,179,0,0.25)' : 'rgba(255,255,255,0.06)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.setLineDash([]);
+      if (labelSet.has(yr)) {
+        ctx.fillStyle = isPred ? 'rgba(255,179,0,0.9)' : 'rgba(160,180,210,0.85)';
+        ctx.font = `bold 12px 'DM Sans', 'Noto Sans SC', sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(yr, x, PAD.top + pH() + 20);
+      }
+    });
+
+    // Prediction zone fill
+    const px = xP(PRED);
+    const gr = ctx.createLinearGradient(px, 0, PAD.left + pW(), 0);
+    gr.addColorStop(0, 'rgba(255,179,0,0)');
+    gr.addColorStop(1, 'rgba(255,179,0,0.07)');
+    ctx.fillStyle = gr;
+    ctx.fillRect(px, PAD.top, PAD.left + pW() - px, pH());
+
+    ctx.fillStyle = 'rgba(255,179,0,0.7)';
+    ctx.font = `bold 11px 'DM Sans', 'Noto Sans SC', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText('▶ 预测区域', px + (PAD.left + pW() - px) / 2, PAD.top + 16);
+
+    // X-axis baseline
+    ctx.beginPath();
+    ctx.moveTo(PAD.left, PAD.top + pH());
+    ctx.lineTo(PAD.left + pW(), PAD.top + pH());
+    ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([]);
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
+  // ── DRAW LINE ──
+  function drawLine(data, color, progress, dashed) {
+    const count = Math.floor(data.length * progress);
+    if (count < 2) return;
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur  = dashed ? 18 : 22;
+    ctx.beginPath();
+    ctx.moveTo(xP(data[0].yr), yP(data[0].val));
+    for (let i = 1; i < count; i++) ctx.lineTo(xP(data[i].yr), yP(data[i].val));
+    if (dashed) ctx.setLineDash([10, 7]);
+    ctx.strokeStyle = color;
+    ctx.lineWidth   = dashed ? 2.5 : 3.5;
+    ctx.lineJoin    = 'round';
+    ctx.stroke();
+
+    // Double-pass for extra brightness
+    ctx.shadowBlur = 6;
+    ctx.lineWidth  = dashed ? 1 : 1.5;
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+    ctx.stroke();
+
+    // Glowing end dot
+    const last = data[count - 1];
+    ctx.setLineDash([]);
+    ctx.shadowColor = color; ctx.shadowBlur = 28;
+    ctx.beginPath();
+    ctx.arc(xP(last.yr), yP(last.val), 6, 0, Math.PI*2);
+    ctx.fillStyle = color;
+    ctx.fill();
+
+    // White core
+    ctx.shadowBlur = 0;
+    ctx.beginPath();
+    ctx.arc(xP(last.yr), yP(last.val), 2.5, 0, Math.PI*2);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+
+    // Outer ring
+    ctx.beginPath();
+    ctx.arc(xP(last.yr), yP(last.val), 10, 0, Math.PI*2);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1;
+    ctx.globalAlpha = 0.25;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ── MILESTONE MARKERS ──
+  const MARKERS = [
+    { yr:1984, label:'Flynn 效应',   color:'#00d4ff', data:humanData, offset:[-2,-42] },
+    { yr:2006, label:'CUDA',         color:'#00ffb3', data:chipData,  offset:[2,-42]  },
+    { yr:2016, label:'TPU',          color:'#00ffb3', data:chipData,  offset:[2,-42]  },
+    { yr:2017, label:'Transformer',  color:'#c084fc', data:aiData,    offset:[0,-42]  },
+    { yr:2022, label:'ChatGPT+H100', color:'#c084fc', data:aiData,    offset:[0,-42]  },
+  ];
+
+  function drawMarkers() {
+    MARKERS.forEach(m => {
+      const progress = (m.yr - START) / (END - START);
+      if (progress > animProg) return;
+      const d = m.data.find(d => Math.abs(d.yr - m.yr) < 0.3);
+      if (!d) return;
+      const x = xP(d.yr), y = yP(d.val);
+
+      ctx.save();
+      // Stem
+      ctx.setLineDash([3,4]);
+      ctx.beginPath();
+      ctx.moveTo(x, y-6); ctx.lineTo(x, y-30);
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.lineWidth = 1; ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Diamond
+      ctx.beginPath();
+      ctx.moveTo(x,    y-6);
+      ctx.lineTo(x+5,  y-12);
+      ctx.lineTo(x,    y-18);
+      ctx.lineTo(x-5,  y-12);
+      ctx.closePath();
+      ctx.fillStyle = m.color;
+      ctx.shadowColor = m.color; ctx.shadowBlur = 12;
+      ctx.fill();
+
+      // Label
+      ctx.shadowBlur = 0;
+      ctx.font = `700 12px 'DM Sans', 'Noto Sans SC', sans-serif`;
+      ctx.fillStyle = 'rgba(240,246,255,0.95)';
+      ctx.textAlign = 'center';
+      ctx.fillText(m.label, x, y-38);
+      ctx.restore();
+    });
+  }
+
+  // ── ANIMATION ──
+  let animProg = 0, animStart = null;
+  const DURATION = 3200;
+
+  function ease(t) { return t<.5?2*t*t:-1+(4-2*t)*t; }
+
+  function animate(ts) {
+    if (!animStart) animStart = ts;
+    animProg = Math.min((ts - animStart) / DURATION, 1);
+    drawAll(ease(animProg));
+    if (animProg < 1) requestAnimationFrame(animate);
+  }
+
+  function drawAll(p) {
+    ctx.clearRect(0, 0, canvas.width / DPR, canvas.height / DPR);
+    drawGrid();
+
+    const splitIdx = years.findIndex(y => y >= PRED);
+    const splitFrac = splitIdx / years.length;
+
+    // Solid
+    drawLine(humanData.slice(0, splitIdx+1), '#38bdf8', Math.min(p / splitFrac, 1), false);
+    drawLine(chipData.slice(0,  splitIdx+1), '#2dd4aa', Math.min(p / splitFrac, 1), false);
+    drawLine(aiData.slice(0,    splitIdx+1), '#b197fc', Math.min(p / splitFrac, 1), false);
+
+    // Dashed prediction
+    if (p > splitFrac) {
+      const pp = (p - splitFrac) / (1 - splitFrac);
+      drawLine(humanData.slice(splitIdx), '#38bdf8', pp, true);
+      drawLine(chipData.slice(splitIdx),  '#2dd4aa', pp, true);
+      drawLine(aiData.slice(splitIdx),    '#b197fc', pp, true);
+    }
+
+    if (p > 0.25) drawMarkers();
+  }
+
+  // ── CROSSHAIR & READOUT ──
+  let hoverX = -1;
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const yr = START + (mx - PAD.left) / pW() * (END - START);
+    if (yr < START || yr > END) { clearReadout(); return; }
+
+    hoverX = mx;
+    const ry = Math.round(yr * 4) / 4;
+
+    roYear.textContent  = Math.round(ry) + ' 年' + (ry >= PRED ? ' （预测）' : '');
+    roHuman.textContent = humanIdx(ry).toFixed(2) + '×';
+    roChip.textContent  = fmt(chipIdx(ry));
+    roAi.textContent    = ry < 2017 ? '≈ 1×（前LLM时代）' : fmt(aiIdx(ry));
+
+    // Draw crosshair on top
+    drawAll(ease(animProg));
+    drawCrosshair(mx, yr);
+  });
+
+  canvas.addEventListener('mouseleave', () => { hoverX = -1; clearReadout(); drawAll(ease(animProg)); });
+
+  function clearReadout() {
+    roYear.textContent  = '— 悬停图表查看数值 —';
+    roHuman.textContent = roChip.textContent = roAi.textContent = '—';
+  }
+
+  function drawCrosshair(mx, yr) {
+    ctx.save();
+    ctx.setLineDash([4,5]);
+    ctx.beginPath();
+    ctx.moveTo(mx, PAD.top); ctx.lineTo(mx, PAD.top + pH());
+    ctx.strokeStyle = 'rgba(245,158,11,0.4)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Dots on each curve
+    [[humanData,'#38bdf8'],[chipData,'#2dd4aa'],[aiData,'#b197fc']].forEach(([data, col]) => {
+      const d = data.find(d => Math.abs(d.yr - yr) < 0.2);
+      if (!d) return;
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(xP(d.yr), yP(d.val), 5, 0, Math.PI*2);
+      ctx.fillStyle = col;
+      ctx.shadowColor = col; ctx.shadowBlur = 12;
+      ctx.fill();
+    });
+    ctx.restore();
+  }
+
+  function fmt(n) {
+    if (n >= 1e9) return (n/1e9).toFixed(1) + 'B×';
+    if (n >= 1e6) return (n/1e6).toFixed(1) + 'M×';
+    if (n >= 1e3) return (n/1e3).toFixed(1) + 'K×';
+    return n.toFixed(2) + '×';
+  }
+
+  // ── INIT ──
+  window.addEventListener('resize', () => { ctx.setTransform(1,0,0,1,0,0); resize(); });
+  resize();
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
